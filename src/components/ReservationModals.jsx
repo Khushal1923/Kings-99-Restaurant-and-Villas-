@@ -55,12 +55,12 @@ export default function ReservationModals() {
   }, [modalState.prefill]);
 
   if (!modalState.isOpen) return (
-    /* Floating WhatsApp Button */
+    /* Floating WhatsApp Button (Swapped to Bottom-Right) */
     <a
       href={`https://wa.me/${siteData.settings.whatsappNumber}?text=${encodeURIComponent("Hello King's 99, I'd like to make a reservation.")}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl shadow-emerald-500/50 hover:scale-110 hover:rotate-6 transition-all duration-300"
+      className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl shadow-emerald-500/50 hover:scale-110 hover:rotate-6 transition-all duration-300"
       title="Instant WhatsApp Booking"
     >
       <MessageCircle className="w-7 h-7 fill-current" />

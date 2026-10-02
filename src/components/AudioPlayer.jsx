@@ -37,10 +37,10 @@ export default function AudioPlayer() {
     <>
       <audio ref={audioRef} loop preload="none" />
 
-      {/* Floating Audio Controller Badge */}
+      {/* Floating Audio Controller Badge (Swapped to Bottom-Left) */}
       <button
         onClick={toggleAudio}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#121822]/90 hover:bg-[#192230] border border-gold/30 hover:border-gold backdrop-blur-xl shadow-2xl shadow-black/80 transition-all duration-300 hover:scale-105"
+        className="fixed bottom-6 left-6 z-40 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#121822]/90 hover:bg-[#192230] border border-gold/30 hover:border-gold backdrop-blur-xl shadow-2xl shadow-black/80 transition-all duration-300 hover:scale-105"
         title="Toggle Ambient Music"
       >
         {isAudioPlaying ? (
