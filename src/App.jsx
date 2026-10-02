@@ -4,9 +4,9 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ExperienceStrip from './components/ExperienceStrip';
 import GallerySection from './components/GallerySection';
+import ReelsSection from './components/ReelsSection';
 import MenuSection from './components/MenuSection';
 import VillasSection from './components/VillasSection';
-import ReelsSection from './components/ReelsSection';
 import ReviewsSection from './components/ReviewsSection';
 import LocationSection from './components/LocationSection';
 import Footer from './components/Footer';
@@ -29,8 +29,11 @@ function MainLayout() {
       {/* Quick Highlights Strip */}
       <ExperienceStrip />
 
-      {/* Photo Gallery (Placed above Menu / Villas) */}
+      {/* Photo Gallery */}
       <GallerySection />
+
+      {/* Video Highlights & Instagram Reels (Glimpse of King's 99) */}
+      <ReelsSection />
 
       {/* Contextual Hub Sections */}
       {isRestaurant ? (
@@ -40,9 +43,6 @@ function MainLayout() {
         /* Villa Hub: Show Villas (Menu is removed from Villa page) */
         <VillasSection />
       )}
-
-      {/* Video Highlights & Instagram Reels */}
-      <ReelsSection />
 
       {/* Verified Google Reviews */}
       <ReviewsSection />

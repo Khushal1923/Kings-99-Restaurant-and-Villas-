@@ -72,6 +72,7 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-8">
           <a href="#home" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Home</a>
           <a href="#gallery-section" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Gallery</a>
+          <a href="#reels-section" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Videos</a>
           
           {isRestaurant ? (
             <a href="#menu-section" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Menu</a>
@@ -79,7 +80,6 @@ export default function Navbar() {
             <a href="#villas-section" className="text-sm font-medium text-gray-300 hover:text-emerald-400 transition-colors">Villas</a>
           )}
 
-          <a href="#reels-section" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Videos</a>
           <a href="#location-section" className="text-sm font-medium text-gray-300 hover:text-gold-light transition-colors">Location</a>
         </nav>
 
@@ -131,6 +131,7 @@ export default function Navbar() {
 
           <a href="#home" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Home</a>
           <a href="#gallery-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Photo Gallery</a>
+          <a href="#reels-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Live Instagram Reels</a>
 
           {isRestaurant ? (
             <a href="#menu-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Menu & Dishes</a>
@@ -138,7 +139,6 @@ export default function Navbar() {
             <a href="#villas-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-emerald-400 py-1">Luxury Villas</a>
           )}
 
-          <a href="#reels-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Live Instagram Reels</a>
           <a href="#location-section" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-gold py-1">Directions & Contact</a>
 
           <button
