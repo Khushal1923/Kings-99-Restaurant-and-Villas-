@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSiteData } from '../context/SiteDataContext';
 import { hashPassword, checkRateLimit, recordFailedAttempt, resetLoginAttempts } from '../utils/security';
+import { pushDataToGitHub } from '../utils/githubSync';
 import {
   Lock, KeyRound, Film, Utensils, Home, Images, Sliders, Database,
-  Plus, Trash2, Edit3, Save, X, Upload, ExternalLink, RotateCcw, AlertCircle, Video, Camera
+  Plus, Trash2, Edit3, Save, X, Upload, ExternalLink, RotateCcw, AlertCircle, Video, Camera, Globe, Loader2, CheckCircle2
 } from 'lucide-react';
 
 export default function AdminPortal() {
@@ -14,6 +15,13 @@ export default function AdminPortal() {
   const [authError, setAuthError] = useState('');
   const [activeTab, setActiveTab] = useState('hero'); // 'hero', 'villas', 'menu', 'gallery', 'settings', 'backup'
   const [toastMsg, setToastMsg] = useState('');
+
+  // GitHub token state (saved in localStorage for easy access)
+  const [githubToken, setGithubToken] = useState(() => {
+    return localStorage.getItem('kings99_github_token') || '';
+  });
+  const [isSyncingToGitHub, setIsSyncingToGitHub] = useState(false);
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState('');
 
   // Editable Form Data clone
   const [formData, setFormData] = useState(siteData);
@@ -31,7 +39,7 @@ export default function AdminPortal() {
 
   const showToast = (msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
   // Authenticate Admin
@@ -75,10 +83,41 @@ export default function AdminPortal() {
     reader.readAsDataURL(file);
   };
 
-  // Save All General & Media Settings
+  // Save Locally
   const handleSaveGeneral = () => {
     updateSiteData(formData);
-    showToast('All changes saved to system!');
+    showToast('Changes saved to your device!');
+  };
+
+  // 1-Click Publish Live to GitHub & Vercel
+  const handlePublishToGitHub = async () => {
+    let token = githubToken.trim();
+    if (!token) {
+      const enteredToken = prompt("Enter your GitHub Personal Access Token (starts with ghp_...):");
+      if (!enteredToken) return;
+      token = enteredToken.trim();
+      setGithubToken(token);
+      localStorage.setItem('kings99_github_token', token);
+    }
+
+    setIsSyncingToGitHub(true);
+    setSyncSuccessMsg('');
+
+    try {
+      // First save locally
+      updateSiteData(formData);
+
+      // Push to GitHub repository
+      await pushDataToGitHub(token, formData);
+
+      setSyncSuccessMsg("🚀 Successfully published to GitHub! Vercel is now building and will update live worldwide in ~15 seconds!");
+      showToast("Live sync complete!");
+      setTimeout(() => setSyncSuccessMsg(''), 8000);
+    } catch (err) {
+      alert("GitHub Sync Error: " + err.message);
+    } finally {
+      setIsSyncingToGitHub(false);
+    }
   };
 
   // Dish CRUD
@@ -101,7 +140,7 @@ export default function AdminPortal() {
     setFormData(newFormData);
     updateSiteData(newFormData);
     setEditingDish(null);
-    showToast('Dish saved successfully!');
+    showToast('Dish saved! Remember to click "Publish Live to GitHub" to make it live worldwide.');
   };
 
   const handleDeleteDish = (id) => {
@@ -134,10 +173,10 @@ export default function AdminPortal() {
     setFormData(newFormData);
     updateSiteData(newFormData);
     setEditingVilla(null);
-    showToast('Villa updated successfully!');
+    showToast('Villa updated!');
   };
 
-  // Gallery Photo CRUD with Clean Modal UI
+  // Gallery Photo CRUD
   const handleSaveGalleryPhoto = (e) => {
     e.preventDefault();
     if (!editingGallery) return;
@@ -160,7 +199,7 @@ export default function AdminPortal() {
     setFormData(newFormData);
     updateSiteData(newFormData);
     setEditingGallery(null);
-    showToast('Gallery photo saved!');
+    showToast('Gallery photo saved! Click "Publish Live to GitHub" to make it live for all visitors.');
   };
 
   const handleDeleteGallery = (id) => {
@@ -340,19 +379,50 @@ export default function AdminPortal() {
           {/* Admin Main Body */}
           <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-[#0E141D]">
             
-            {/* Top Bar */}
-            <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-white/5">
+            {/* Top Bar with 1-Click Publish to GitHub */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/5">
               <div>
                 <h2 className="font-serif text-2xl font-bold text-white capitalize">{activeTab} Management</h2>
                 <p className="text-gray-400 text-xs">Directly upload photos and update content with zero database required.</p>
               </div>
-              <button
-                onClick={handleSaveGeneral}
-                className="flex items-center gap-2 bg-gradient-to-r from-gold-metallic via-gold to-gold-dark text-black font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-lg shadow-gold/20 hover:scale-105 transition-all"
-              >
-                <Save className="w-4 h-4" /> Save Changes
-              </button>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  onClick={handleSaveGeneral}
+                  className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all"
+                  title="Save locally in this browser"
+                >
+                  <Save className="w-3.5 h-3.5" /> Save Locally
+                </button>
+
+                <button
+                  onClick={handlePublishToGitHub}
+                  disabled={isSyncingToGitHub}
+                  className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-black font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-105 transition-all disabled:opacity-50"
+                  title="Pushes changes directly to GitHub and auto-deploys on Vercel worldwide"
+                >
+                  {isSyncingToGitHub ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-black" />
+                      <span>Syncing to GitHub...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Globe className="w-4 h-4 text-black" />
+                      <span>🚀 Publish Live to GitHub</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
+
+            {/* Sync Success Alert Banner */}
+            {syncSuccessMsg && (
+              <div className="mb-6 p-4 bg-emerald-500/15 border border-emerald-500/40 rounded-2xl flex items-center gap-3 text-emerald-300 text-xs font-semibold animate-fade-in">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span>{syncSuccessMsg}</span>
+              </div>
+            )}
 
             {/* TAB 1: HERO VIDEOS & MUSIC */}
             {activeTab === 'hero' && (
@@ -679,7 +749,28 @@ export default function AdminPortal() {
 
             {/* TAB 5: SETTINGS & WHATSAPP */}
             {activeTab === 'settings' && (
-              <div className="bg-[#121822] p-6 rounded-2xl border border-white/5 space-y-4 max-w-2xl">
+              <div className="bg-[#121822] p-6 rounded-2xl border border-white/5 space-y-5 max-w-2xl">
+                
+                {/* GitHub Token Setup for 1-Click Live Publish */}
+                <div className="p-4 bg-[#0A0E14] rounded-xl border border-emerald-500/30">
+                  <label className="block text-xs font-bold text-emerald-400 mb-1 flex items-center gap-1.5">
+                    <Globe className="w-4 h-4" /> GitHub Personal Access Token (for 1-Click Live Sync)
+                  </label>
+                  <input
+                    type="password"
+                    value={githubToken}
+                    onChange={(e) => {
+                      setGithubToken(e.target.value);
+                      localStorage.setItem('kings99_github_token', e.target.value.trim());
+                    }}
+                    placeholder="ghp_..."
+                    className="w-full bg-[#121822] border border-white/10 rounded-xl px-4 py-2 text-xs text-white"
+                  />
+                  <small className="text-gray-400 text-[11px] mt-1 block">
+                    Enables the <strong>"🚀 Publish Live to GitHub"</strong> button to deploy changes to Vercel in 15 seconds.
+                  </small>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-gold mb-1">WhatsApp Booking Phone Number</label>
                   <input
@@ -994,7 +1085,7 @@ export default function AdminPortal() {
         </div>
       )}
 
-      {/* MODAL: ADD / EDIT GALLERY PHOTO (CLEAN UI WITH DEVICE UPLOAD) */}
+      {/* MODAL: ADD / EDIT GALLERY PHOTO */}
       {editingGallery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90">
           <div className="bg-[#121822] border border-gold/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
