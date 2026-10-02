@@ -347,12 +347,6 @@ export const DEFAULT_SITE_DATA = {
       image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80"
     },
     {
-      id: "gal-5",
-      title: "Sizzling Tandoor Masterpieces",
-      category: "restaurant",
-      image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80"
-    },
-    {
       id: "gal-6",
       title: "Evening Dam Sunset Ambiance",
       category: "restaurant",
