@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEFAULT_SITE_DATA } from '../data/defaultData';
+import { fetchCloudSiteData, saveCloudSiteData, isSupabaseConfigured } from '../utils/supabaseClient';
 
 const SiteDataContext = createContext();
 
@@ -22,20 +23,48 @@ export function SiteDataProvider({ children }) {
   const [modalState, setModalState] = useState({ isOpen: false, type: 'restaurant', prefill: null });
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [isCloudSyncing, setIsCloudSyncing] = useState(false);
 
-  // Save to localStorage whenever data changes
-  const updateSiteData = (newData) => {
+  // Sync from Supabase Cloud on load
+  useEffect(() => {
+    async function loadFromCloud() {
+      if (isSupabaseConfigured) {
+        setIsCloudSyncing(true);
+        const cloudData = await fetchCloudSiteData();
+        if (cloudData && cloudData.settings) {
+          setSiteData(cloudData);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
+          } catch (e) {}
+        }
+        setIsCloudSyncing(false);
+      }
+    }
+    loadFromCloud();
+  }, []);
+
+  // Save to both localStorage and Supabase Cloud
+  const updateSiteData = async (newData) => {
     setSiteData(newData);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
     } catch (e) {
-      console.error("Failed to save site data to localStorage", e);
+      console.error("Failed to save site data locally", e);
+    }
+
+    if (isSupabaseConfigured) {
+      setIsCloudSyncing(true);
+      await saveCloudSiteData(newData);
+      setIsCloudSyncing(false);
     }
   };
 
-  const resetToDefaults = () => {
+  const resetToDefaults = async () => {
     localStorage.removeItem(STORAGE_KEY);
     setSiteData(DEFAULT_SITE_DATA);
+    if (isSupabaseConfigured) {
+      await saveCloudSiteData(DEFAULT_SITE_DATA);
+    }
   };
 
   const openReservation = (type = 'restaurant', prefill = null) => {
@@ -71,7 +100,8 @@ export function SiteDataProvider({ children }) {
       isAdminOpen,
       setIsAdminOpen,
       isAudioPlaying,
-      setIsAudioPlaying
+      setIsAudioPlaying,
+      isCloudSyncing
     }}>
       {children}
     </SiteDataContext.Provider>
