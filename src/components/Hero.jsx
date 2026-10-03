@@ -56,13 +56,13 @@ export default function Hero() {
           <img 
             src={posterImg} 
             alt="King's 99 Hero Background" 
-            className="w-full h-full object-cover object-center sm:object-center transform scale-100 sm:scale-105 transition-transform duration-1000 ease-out" 
+            className="w-full h-full object-cover object-center transform scale-100 sm:scale-105 transition-transform duration-1000 ease-out" 
             fetchPriority="high"
             loading="eager"
           />
         )}
 
-        {/* Multi-Layered Responsive Luxury Vignette for Pristine Contrast on Mobile & Desktop */}
+        {/* Multi-Layered Responsive Luxury Vignette for Contrast on Mobile & Desktop */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F15]/90 via-[#0B0F15]/60 to-[#0B0F15] sm:from-[#0B0F15]/80 sm:via-[#0B0F15]/45 sm:to-[#0B0F15] z-1" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#0B0F15]/40 to-[#0B0F15]/90 z-1" />
       </div>
