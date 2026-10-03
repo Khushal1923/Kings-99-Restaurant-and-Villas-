@@ -5,7 +5,16 @@ const SiteDataContext = createContext();
 
 const STORAGE_KEY = 'kings99_react_data_v1';
 
-// Determines the freshest initial site data (compares local storage vs bundled data timestamp)
+// Universal UTF-8 base64 decoder for GitHub API responses
+function base64ToUtf8(base64) {
+  try {
+    return decodeURIComponent(escape(window.atob(base64.replace(/\s/g, ''))));
+  } catch (e) {
+    return window.atob(base64.replace(/\s/g, ''));
+  }
+}
+
+// Determines the freshest initial site data on startup
 function getInitialSiteData() {
   try {
     const storedStr = localStorage.getItem(STORAGE_KEY);
@@ -34,7 +43,7 @@ export function SiteDataProvider({ children }) {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
-  // Save to localStorage whenever admin saves locally
+  // Save to state and localStorage whenever admin makes edits
   const updateSiteData = (newData) => {
     const dataWithTimestamp = {
       ...newData,
@@ -61,37 +70,84 @@ export function SiteDataProvider({ children }) {
     setModalState({ isOpen: false, type: 'restaurant', prefill: null });
   };
 
-  // Live Sync Engine: Fetch latest data directly from GitHub in real-time so all devices worldwide get updates instantly
+  // Real-Time GitHub Live Sync: Fetches newest repository data instantly across all devices
   useEffect(() => {
-    async function syncFromGitHub() {
+    let isMounted = true;
+
+    async function syncLatestFromGitHub() {
+      // 1. Try GitHub Contents API (Instant 0-second cache, official REST endpoint)
       try {
-        const rawUrl = `https://raw.githubusercontent.com/Khushal1923/Kings-99-Restaurant-and-Villas-/main/src/data/defaultData.js?t=${Date.now()}`;
-        const res = await fetch(rawUrl);
-        if (res.ok) {
-          const text = await res.text();
-          // Extract DEFAULT_SITE_DATA JSON
+        const apiRes = await fetch(
+          'https://api.github.com/repos/Khushal1923/Kings-99-Restaurant-and-Villas-/contents/src/data/defaultData.js',
+          {
+            headers: { Accept: 'application/vnd.github.v3+json' },
+            cache: 'no-store'
+          }
+        );
+        if (apiRes.ok) {
+          const resJson = await apiRes.json();
+          if (resJson.content) {
+            const decodedText = base64ToUtf8(resJson.content);
+            const match = decodedText.match(/DEFAULT_SITE_DATA\s*=\s*(\{[\s\S]*\});/);
+            if (match && match[1]) {
+              const remoteData = JSON.parse(match[1]);
+              const remoteTime = Number(remoteData.lastUpdated) || 0;
+
+              if (isMounted) {
+                setSiteData((current) => {
+                  const currentTime = Number(current.lastUpdated) || 0;
+                  if (remoteTime > currentTime) {
+                    console.log("⚡ Auto-synced newest live data from GitHub API!", remoteData);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteData));
+                    return remoteData;
+                  }
+                  return current;
+                });
+              }
+              return; // Succeeded via GitHub API
+            }
+          }
+        }
+      } catch (err) {
+        // Fall through to raw CDN attempt
+      }
+
+      // 2. Fallback to raw GitHub content
+      try {
+        const rawRes = await fetch(
+          `https://raw.githubusercontent.com/Khushal1923/Kings-99-Restaurant-and-Villas-/main/src/data/defaultData.js?t=${Date.now()}`,
+          { cache: 'no-store' }
+        );
+        if (rawRes.ok) {
+          const text = await rawRes.text();
           const match = text.match(/DEFAULT_SITE_DATA\s*=\s*(\{[\s\S]*\});/);
           if (match && match[1]) {
             const remoteData = JSON.parse(match[1]);
             const remoteTime = Number(remoteData.lastUpdated) || 0;
 
-            setSiteData((current) => {
-              const currentTime = Number(current.lastUpdated) || 0;
-              if (remoteTime > currentTime) {
-                console.log("⚡ Auto-synced newest site data from GitHub!", remoteData);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteData));
-                return remoteData;
-              }
-              return current;
-            });
+            if (isMounted) {
+              setSiteData((current) => {
+                const currentTime = Number(current.lastUpdated) || 0;
+                if (remoteTime > currentTime) {
+                  console.log("⚡ Auto-synced newest live data from GitHub Raw!", remoteData);
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteData));
+                  return remoteData;
+                }
+                return current;
+              });
+            }
           }
         }
       } catch (err) {
-        console.warn("GitHub live fetch error (quiet fallback):", err);
+        console.warn("GitHub live sync fallback error (quiet):", err);
       }
     }
 
-    syncFromGitHub();
+    syncLatestFromGitHub();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Secret admin shortcut listener: Ctrl+Shift+A or Cmd+Shift+A
