@@ -2,7 +2,7 @@
 // Auto-synced from Admin Portal
 
 export const DEFAULT_SITE_DATA = {
-  "lastUpdated": 1791002367832,
+  "lastUpdated": 1791002408482,
   "settings": {
     "resortName": "King's 99",
     "tagline": "Royal Dam-View Dining & Luxury Villa Resort",
@@ -346,13 +346,6 @@ export const DEFAULT_SITE_DATA = {
     }
   ],
   "gallery": [
-    {
-      "id": "gal-rest-4",
-      "title": "Evening Dam Sunset Ambiance & Dining",
-      "category": "restaurant",
-      "tag": "Dam View & Ambiance",
-      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80"
-    },
     {
       "id": "gal-rest-5",
       "title": "Handcrafted Refreshing Mocktails & Drinks",
