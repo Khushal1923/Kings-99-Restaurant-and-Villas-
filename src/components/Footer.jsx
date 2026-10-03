@@ -111,13 +111,14 @@ export default function Footer() {
             © {new Date().getFullYear()} King's 99 Restaurant & Villa Resort. All rights reserved.
           </div>
           {/* Subtle secret trigger for owner/admin */}
-          <div 
+          <button 
+            type="button"
             onClick={() => setIsAdminOpen(true)}
-            className="cursor-pointer text-[10px] text-gray-700 hover:text-gray-500 transition-colors"
-            title="Admin Login (Ctrl+Shift+A)"
+            className="cursor-pointer text-[11px] text-gray-500 hover:text-gold py-1.5 px-3 rounded-lg hover:bg-white/5 transition-colors"
+            title="Owner / Admin Portal"
           >
-            Owner Portal • SRS Paradise
-          </div>
+            🔐 Owner Portal • SRS Paradise
+          </button>
         </div>
 
       </div>

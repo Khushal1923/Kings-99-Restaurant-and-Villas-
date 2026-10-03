@@ -3,11 +3,26 @@ import { useSiteData } from '../context/SiteDataContext';
 import { Utensils, Home, Menu, X, MessageCircle } from 'lucide-react';
 
 export default function Navbar() {
-  const { activeHub, setActiveHub, openReservation } = useSiteData();
+  const { activeHub, setActiveHub, openReservation, setIsAdminOpen } = useSiteData();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoTapCount, setLogoTapCount] = useState(0);
 
   const isRestaurant = activeHub === 'restaurant';
+
+  // Secret 3-tap gesture on logo to open admin on mobile
+  const handleLogoClick = (e) => {
+    const nextCount = logoTapCount + 1;
+    setLogoTapCount(nextCount);
+    if (nextCount >= 3) {
+      e.preventDefault();
+      setIsAdminOpen(true);
+      setLogoTapCount(0);
+    }
+    setTimeout(() => {
+      setLogoTapCount(0);
+    }, 1500);
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -28,8 +43,11 @@ export default function Navbar() {
         {/* Top Header Bar */}
         <div className="flex items-center justify-between">
           
-          {/* Brand Logo & Name */}
-          <a href="#home" className="flex items-center gap-2.5 sm:gap-3 group">
+          {/* Brand Logo & Name (Tap 3 times for Admin) */}
+          <div 
+            onClick={handleLogoClick}
+            className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none"
+          >
             <img 
               src="assets/logo.jpg" 
               alt="King's 99 Logo" 
@@ -43,7 +61,7 @@ export default function Navbar() {
                 {isRestaurant ? "Royal Restaurant" : "Luxury Villas"}
               </span>
             </div>
-          </a>
+          </div>
 
           {/* Dual Hub Switcher (Desktop Only) */}
           <div className="hidden md:flex items-center bg-black/40 border border-gold/20 rounded-full p-1 backdrop-blur-md">

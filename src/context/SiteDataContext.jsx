@@ -150,7 +150,7 @@ export function SiteDataProvider({ children }) {
     };
   }, []);
 
-  // Secret admin shortcut listener: Ctrl+Shift+A or Cmd+Shift+A
+  // Secret admin shortcut listener: Ctrl+Shift+A or Cmd+Shift+A & URL Hash (#admin)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
@@ -158,8 +158,20 @@ export function SiteDataProvider({ children }) {
         setIsAdminOpen(prev => !prev);
       }
     };
+
+    const checkHash = () => {
+      if (window.location.hash === '#admin' || window.location.hash === '#admin-portal') {
+        setIsAdminOpen(true);
+      }
+    };
+
+    checkHash();
+    window.addEventListener('hashchange', checkHash);
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('hashchange', checkHash);
+    };
   }, []);
 
   return (
