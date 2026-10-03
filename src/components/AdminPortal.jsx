@@ -16,12 +16,12 @@ export default function AdminPortal() {
   const [activeTab, setActiveTab] = useState('hero'); // 'hero', 'villas', 'menu', 'gallery', 'settings', 'backup'
   const [toastMsg, setToastMsg] = useState('');
 
-  // GitHub token state (saved in localStorage for easy access)
   const [githubToken, setGithubToken] = useState(() => {
     return localStorage.getItem('kings99_github_token') || '';
   });
   const [isSyncingToGitHub, setIsSyncingToGitHub] = useState(false);
   const [syncSuccessMsg, setSyncSuccessMsg] = useState('');
+  const [galleryFilter, setGalleryFilter] = useState('all'); // 'all', 'restaurant', 'villas'
 
   // Editable Form Data clone
   const [formData, setFormData] = useState(siteData);
@@ -185,6 +185,7 @@ export default function AdminPortal() {
       id: editingGallery.id || ('gal-' + Date.now()),
       title: editingGallery.title || 'King\'s 99 Photo',
       category: editingGallery.category || 'villas',
+      tag: editingGallery.tag || (editingGallery.category === 'restaurant' ? 'Chef Specials & Dishes' : 'Villa Lawns & Exterior'),
       image: editingGallery.image || 'assets/villas/villa1.jpg'
     };
 
@@ -696,17 +697,21 @@ export default function AdminPortal() {
               </div>
             )}
 
-            {/* TAB 4: GALLERY (MODAL DRIVEN) */}
+            {/* TAB 4: GALLERY (SEPARATE RESTAURANT & VILLA GALLERIES) */}
             {activeTab === 'gallery' && (
               <div>
-                <div className="flex justify-between items-center mb-6">
-                  <p className="text-gray-400 text-xs">Manage photos displayed in the Royal Gallery on the website.</p>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <div>
+                    <h3 className="text-sm font-bold text-white mb-1">Royal Photo Galleries</h3>
+                    <p className="text-gray-400 text-xs">Separate photo collections are displayed for the Restaurant and Villa pages.</p>
+                  </div>
                   <button
                     onClick={() => setEditingGallery({
                       isNew: true,
                       title: '',
-                      category: 'villas',
-                      image: 'assets/villas/villa1.jpg'
+                      category: galleryFilter === 'villas' ? 'villas' : 'restaurant',
+                      tag: galleryFilter === 'villas' ? 'Villa Lawns & Exterior' : 'Chef Specials & Dishes',
+                      image: galleryFilter === 'villas' ? 'assets/villas/villa1.jpg' : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'
                     })}
                     className="flex items-center gap-1.5 bg-gold hover:bg-gold-light text-black font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-gold/20"
                   >
@@ -714,35 +719,91 @@ export default function AdminPortal() {
                   </button>
                 </div>
 
+                {/* Hub Filter Switcher */}
+                <div className="flex items-center gap-2 mb-6">
+                  <button
+                    onClick={() => setGalleryFilter('all')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                      galleryFilter === 'all'
+                        ? 'bg-white/20 text-white border border-white/20'
+                        : 'bg-[#121822] text-gray-400 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    All Photos ({formData.gallery.length})
+                  </button>
+                  <button
+                    onClick={() => setGalleryFilter('restaurant')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      galleryFilter === 'restaurant'
+                        ? 'bg-gold text-black shadow-lg shadow-gold/20'
+                        : 'bg-[#121822] text-gold-light hover:text-white border border-gold/20'
+                    }`}
+                  >
+                    <Utensils className="w-3.5 h-3.5" />
+                    🍽️ Restaurant Gallery ({formData.gallery.filter(g => (g.category || '').toLowerCase() === 'restaurant').length})
+                  </button>
+                  <button
+                    onClick={() => setGalleryFilter('villas')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      galleryFilter === 'villas'
+                        ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20'
+                        : 'bg-[#121822] text-emerald-400 hover:text-white border border-emerald-500/20'
+                    }`}
+                  >
+                    <Home className="w-3.5 h-3.5" />
+                    🏡 Villa Gallery ({formData.gallery.filter(g => (g.category || '').toLowerCase() === 'villas' || (g.category || '').toLowerCase() === 'villa').length})
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {formData.gallery.map((g) => (
-                    <div key={g.id} className="relative h-48 rounded-2xl overflow-hidden group bg-black border border-white/5">
-                      <img src={g.image} alt={g.title} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 flex flex-col justify-between p-3.5 transition-opacity duration-300">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-gold-light bg-black/60 px-2 py-0.5 rounded w-fit">
-                          {g.category === 'restaurant' ? '🍽️ Dining' : '🏡 Villa'}
-                        </span>
-                        <div>
-                          <p className="text-xs text-white font-bold mb-2 line-clamp-1">{g.title}</p>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setEditingGallery({ ...g, isNew: false })}
-                              className="flex-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold py-1 rounded"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteGallery(g.id)}
-                              className="bg-rose-500 hover:bg-rose-600 text-white p-1 rounded"
-                              title="Delete Photo"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                  {formData.gallery
+                    .filter(g => {
+                      if (galleryFilter === 'all') return true;
+                      const cat = (g.category || '').toLowerCase();
+                      if (galleryFilter === 'restaurant') return cat === 'restaurant';
+                      if (galleryFilter === 'villas') return cat === 'villas' || cat === 'villa';
+                      return true;
+                    })
+                    .map((g) => {
+                      const isRest = (g.category || '').toLowerCase() === 'restaurant';
+                      return (
+                        <div key={g.id} className="relative h-48 rounded-2xl overflow-hidden group bg-black border border-white/5">
+                          <img src={g.image} alt={g.title} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 flex flex-col justify-between p-3.5 transition-opacity duration-300">
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded w-fit ${
+                                isRest ? 'text-gold-light bg-gold/20 border border-gold/30' : 'text-emerald-300 bg-emerald-500/20 border border-emerald-500/30'
+                              }`}>
+                                {isRest ? '🍽️ Restaurant' : '🏡 Villa'}
+                              </span>
+                              {g.tag && (
+                                <span className="text-[9px] text-gray-300 bg-black/60 px-1.5 py-0.5 rounded">
+                                  {g.tag}
+                                </span>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-xs text-white font-bold mb-2 line-clamp-1">{g.title}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setEditingGallery({ ...g, isNew: false })}
+                                  className="flex-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold py-1 rounded"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteGallery(g.id)}
+                                  className="bg-rose-500 hover:bg-rose-600 text-white p-1 rounded"
+                                  title="Delete Photo"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -1109,16 +1170,50 @@ export default function AdminPortal() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gold-light mb-1.5">Category *</label>
-                <select
-                  value={editingGallery.category}
-                  onChange={(e) => setEditingGallery({ ...editingGallery, category: e.target.value })}
-                  className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
-                >
-                  <option value="villas">🏡 Villas & Nature</option>
-                  <option value="restaurant">🍽️ Restaurant & Dining</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gold-light mb-1.5">Target Gallery *</label>
+                  <select
+                    value={editingGallery.category || 'restaurant'}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      setEditingGallery({
+                        ...editingGallery,
+                        category: newCat,
+                        tag: newCat === 'restaurant' ? 'Chef Specials & Dishes' : 'Villa Lawns & Exterior'
+                      });
+                    }}
+                    className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
+                  >
+                    <option value="restaurant">🍽️ Restaurant Gallery</option>
+                    <option value="villas">🏡 Villa Gallery</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gold-light mb-1.5">Photo Tag / Filter</label>
+                  {editingGallery.category === 'restaurant' ? (
+                    <select
+                      value={editingGallery.tag || 'Chef Specials & Dishes'}
+                      onChange={(e) => setEditingGallery({ ...editingGallery, tag: e.target.value })}
+                      className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
+                    >
+                      <option value="Chef Specials & Dishes">🍽️ Chef Specials & Dishes</option>
+                      <option value="Dam View & Ambiance">🌅 Dam View & Ambiance</option>
+                      <option value="Mocktails & Drinks">🍹 Mocktails & Drinks</option>
+                    </select>
+                  ) : (
+                    <select
+                      value={editingGallery.tag || 'Villa Lawns & Exterior'}
+                      onChange={(e) => setEditingGallery({ ...editingGallery, tag: e.target.value })}
+                      className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="Villa Lawns & Exterior">🏡 Villa Lawns & Exterior</option>
+                      <option value="Suites & Interiors">🛏️ Suites & Interiors</option>
+                      <option value="Mountain & Dam Views">⛰️ Mountain & Dam Views</option>
+                    </select>
+                  )}
+                </div>
               </div>
 
               {/* Photo Upload & Preview */}
