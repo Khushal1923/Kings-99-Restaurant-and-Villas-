@@ -2,7 +2,7 @@
 // Auto-synced from Admin Portal
 
 export const DEFAULT_SITE_DATA = {
-  "lastUpdated": 1791002408482,
+  "lastUpdated": 1791002498186,
   "settings": {
     "resortName": "King's 99",
     "tagline": "Royal Dam-View Dining & Luxury Villa Resort",
@@ -347,34 +347,6 @@ export const DEFAULT_SITE_DATA = {
   ],
   "gallery": [
     {
-      "id": "gal-rest-5",
-      "title": "Handcrafted Refreshing Mocktails & Drinks",
-      "category": "restaurant",
-      "tag": "Mocktails & Drinks",
-      "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-rest-6",
-      "title": "Shahi Paneer Lazeez with Butter Naan",
-      "category": "restaurant",
-      "tag": "Chef Specials & Dishes",
-      "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-rest-7",
-      "title": "Candlelit Evening Tables by the Waters",
-      "category": "restaurant",
-      "tag": "Dam View & Ambiance",
-      "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-rest-8",
-      "title": "Sizzling Hot Fudge Walnut Brownie",
-      "category": "restaurant",
-      "tag": "Chef Specials & Dishes",
-      "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80"
-    },
-    {
       "id": "gal-villa-1",
       "title": "The Royal Hillside Villa & Terrace",
       "category": "villas",
@@ -408,27 +380,6 @@ export const DEFAULT_SITE_DATA = {
       "category": "villas",
       "tag": "Suites & Interiors",
       "image": "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-villa-6",
-      "title": "Private Evening Lawn & Bonfire Zone",
-      "category": "villas",
-      "tag": "Villa Lawns & Exterior",
-      "image": "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-villa-7",
-      "title": "Master Suite with Scenic Mountain Windows",
-      "category": "villas",
-      "tag": "Suites & Interiors",
-      "image": "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      "id": "gal-villa-8",
-      "title": "Lush Greenery & Morning Mist in Pahine",
-      "category": "villas",
-      "tag": "Mountain & Dam Views",
-      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
     }
   ],
   "reviews": [
