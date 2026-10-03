@@ -2,7 +2,7 @@
 // Auto-synced from Admin Portal
 
 export const DEFAULT_SITE_DATA = {
-  "lastUpdated": 1791021317668,
+  "lastUpdated": 1791021326983,
   "settings": {
     "resortName": "King's 99",
     "tagline": "Royal Dam-View Dining & Luxury Villa Resort",
