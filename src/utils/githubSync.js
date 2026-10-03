@@ -36,8 +36,13 @@ export async function pushDataToGitHub(token, siteData) {
   const fileData = await getRes.json();
   const currentSha = fileData.sha;
 
-  // 2. Prepare new file content
-  const fileContent = `// King's 99 - Production Default Data Store\n// Auto-synced from Admin Portal\n\nexport const DEFAULT_SITE_DATA = ${JSON.stringify(siteData, null, 2)};\n`;
+  // 2. Prepare new file content with current timestamp for instant cross-device cache invalidation
+  const updatedData = {
+    ...siteData,
+    lastUpdated: Date.now()
+  };
+
+  const fileContent = `// King's 99 - Production Default Data Store\n// Auto-synced from Admin Portal\n\nexport const DEFAULT_SITE_DATA = ${JSON.stringify(updatedData, null, 2)};\n`;
   const base64Content = utf8ToBase64(fileContent);
 
   // 3. Commit new file to main branch
@@ -61,5 +66,5 @@ export async function pushDataToGitHub(token, siteData) {
     throw new Error(`GitHub commit failed: ${errText}`);
   }
 
-  return await putRes.json();
+  return updatedData;
 }

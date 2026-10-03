@@ -1,6 +1,7 @@
 // King's 99 - Production Default Data Store
 
 export const DEFAULT_SITE_DATA = {
+  lastUpdated: 1790930000000,
   settings: {
     resortName: "King's 99",
     tagline: "Royal Dam-View Dining & Luxury Villa Resort",
