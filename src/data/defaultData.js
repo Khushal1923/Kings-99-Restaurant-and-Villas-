@@ -144,16 +144,6 @@ export const DEFAULT_SITE_DATA = {
       "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80"
     },
     {
-      "id": "dish-4",
-      "name": "Murgh Malai Tikka",
-      "category": "Tandoor & Starters",
-      "price": 390,
-      "type": "nonveg",
-      "badge": "Popular",
-      "description": "Boneless chicken marinated in hung curd, fresh cream, cheese, and mild fragrant spices, charcoal grilled.",
-      "image": "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80"
-    },
-    {
       "id": "dish-5",
       "name": "Tandoori Chicken (Half / Full)",
       "category": "Tandoor & Starters",
