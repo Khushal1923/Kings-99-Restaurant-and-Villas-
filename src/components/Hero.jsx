@@ -7,14 +7,18 @@ export default function Hero() {
   const videoRef = useRef(null);
 
   const isRestaurant = activeHub === 'restaurant';
+  const mediaType = isRestaurant 
+    ? (siteData.settings.restaurantHeroMediaType || (siteData.settings.restaurantHeroVideo ? 'video' : 'image'))
+    : (siteData.settings.villaHeroMediaType || (siteData.settings.villaHeroVideo ? 'video' : 'image'));
+
   const videoSrc = isRestaurant 
     ? (siteData.settings.restaurantHeroVideo || '') 
     : (siteData.settings.villaHeroVideo || '');
   const posterImg = isRestaurant 
-    ? siteData.settings.restaurantHeroFallbackImg 
+    ? (siteData.settings.restaurantHeroFallbackImg || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80')
     : (siteData.settings.villaHeroFallbackImg || 'assets/villas/villa1.jpg');
 
-  const isDirectVideo = videoSrc && (
+  const showVideo = mediaType === 'video' && videoSrc && (
     videoSrc.endsWith('.mp4') || 
     videoSrc.endsWith('.webm') || 
     videoSrc.startsWith('data:video') || 
@@ -25,18 +29,18 @@ export default function Hero() {
   );
 
   useEffect(() => {
-    if (isDirectVideo && videoRef.current) {
+    if (showVideo && videoRef.current) {
       videoRef.current.load();
       videoRef.current.play().catch(() => {});
     }
-  }, [activeHub, videoSrc, isDirectVideo]);
+  }, [activeHub, videoSrc, showVideo, mediaType]);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-16">
       
       {/* Background Media Container */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {isDirectVideo ? (
+        {showVideo ? (
           <video
             ref={videoRef}
             className="w-full h-full object-cover"

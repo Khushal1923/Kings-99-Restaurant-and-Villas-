@@ -430,132 +430,303 @@ export default function AdminPortal() {
               <div className="space-y-6">
                 
                 {/* Villa Hero Media */}
-                <div className="bg-[#121822] p-6 rounded-2xl border border-white/5">
-                  <h3 className="text-emerald-400 font-bold text-sm mb-2 flex items-center gap-2">
-                    <Home className="w-4 h-4" /> Villa Hero Background Video / Photo
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs text-emerald-300 font-bold mb-1.5">Villa Background Video URL (MP4 / WebM)</label>
+                <div className="bg-[#121822] p-6 rounded-2xl border border-emerald-500/20 shadow-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h3 className="text-emerald-400 font-bold text-sm flex items-center gap-2">
+                      <Home className="w-4 h-4" /> Villa Hero Background (Photo / Video)
+                    </h3>
+                    
+                    {/* Mode Selector */}
+                    <div className="flex items-center bg-[#0A0E14] p-1 rounded-xl border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, villaHeroMediaType: 'image' }
+                        })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          (formData.settings.villaHeroMediaType || 'video') === 'image'
+                            ? 'bg-emerald-500 text-black shadow-md'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Camera className="w-3.5 h-3.5" /> 🖼️ Photo Background
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, villaHeroMediaType: 'video' }
+                        })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          (formData.settings.villaHeroMediaType || 'video') === 'video'
+                            ? 'bg-emerald-500 text-black shadow-md'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Film className="w-3.5 h-3.5" /> 🎬 Video Background
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {/* Villa Photo Upload */}
+                    <div className="bg-[#0A0E14] p-4 rounded-xl border border-white/5">
+                      <label className="block text-xs text-emerald-300 font-bold mb-2 flex items-center gap-1.5">
+                        <Camera className="w-4 h-4 text-emerald-400" /> Villa Hero Photo (From Phone / PC)
+                      </label>
+                      
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <img
+                          src={formData.settings.villaHeroFallbackImg || 'assets/villas/villa1.jpg'}
+                          alt="Villa Hero Preview"
+                          className="w-32 h-20 object-cover rounded-xl border border-emerald-500/40 shadow-md"
+                        />
+                        <div className="flex-1 w-full space-y-2">
+                          <input
+                            type="text"
+                            value={formData.settings.villaHeroFallbackImg || ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              settings: { ...formData.settings, villaHeroFallbackImg: e.target.value }
+                            })}
+                            placeholder="Image URL or upload from your device"
+                            className="w-full bg-[#121822] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                          />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <label className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold px-4 py-2 rounded-xl cursor-pointer transition-all shadow-md">
+                              <Upload className="w-3.5 h-3.5" /> 📷 Upload Photo from Phone/PC
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
+                                  setFormData({
+                                    ...formData,
+                                    settings: {
+                                      ...formData.settings,
+                                      villaHeroFallbackImg: dataUrl,
+                                      villaHeroMediaType: 'image'
+                                    }
+                                  });
+                                }, 'Villa Hero Photo')}
+                              />
+                            </label>
+                            {(formData.settings.villaHeroMediaType || 'video') !== 'image' && (
+                              <button
+                                type="button"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  settings: { ...formData.settings, villaHeroMediaType: 'image' }
+                                })}
+                                className="text-[11px] text-emerald-400 hover:underline"
+                              >
+                                Set as Active Background
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Villa Video Settings */}
+                    <div className="bg-[#0A0E14] p-4 rounded-xl border border-white/5 space-y-3">
+                      <label className="block text-xs text-emerald-300 font-bold flex items-center gap-1.5">
+                        <Video className="w-4 h-4 text-emerald-400" /> Villa Hero Video (MP4 / WebM)
+                      </label>
                       <input
                         type="text"
-                        value={formData.settings.villaHeroVideo}
+                        value={formData.settings.villaHeroVideo || ''}
                         onChange={(e) => setFormData({
                           ...formData,
                           settings: { ...formData.settings, villaHeroVideo: e.target.value }
                         })}
-                        placeholder="Paste .mp4 link or upload directly below"
-                        className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white"
+                        placeholder="Paste .mp4 link or upload below"
+                        className="w-full bg-[#121822] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
                       />
-                      
-                      <div className="flex items-center gap-3 mt-2">
-                        <label className="inline-flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-black text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
-                          <Video className="w-3.5 h-3.5" /> Upload Video from Phone/PC (.mp4)
-                          <input
-                            type="file"
-                            accept="video/mp4,video/webm"
-                            className="hidden"
-                            onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
-                              setFormData({
-                                ...formData,
-                                settings: { ...formData.settings, villaHeroVideo: dataUrl }
-                              });
-                            }, 'Villa Video')}
-                          />
-                        </label>
-                      </div>
+                      <label className="inline-flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-black text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
+                        <Video className="w-3.5 h-3.5" /> Upload Video from Phone/PC (.mp4)
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
+                            setFormData({
+                              ...formData,
+                              settings: {
+                                ...formData.settings,
+                                villaHeroVideo: dataUrl,
+                                villaHeroMediaType: 'video'
+                              }
+                            });
+                          }, 'Villa Video')}
+                        />
+                      </label>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs text-gray-400 mb-1">Villa Background Audio / Song URL (MP3)</label>
-                        <input
-                          type="text"
-                          value={formData.settings.villaAudioUrl}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            settings: { ...formData.settings, villaAudioUrl: e.target.value }
-                          })}
-                          className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-400 mb-1">Villa Poster Background Image</label>
-                        <input
-                          type="text"
-                          value={formData.settings.villaHeroFallbackImg}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            settings: { ...formData.settings, villaHeroFallbackImg: e.target.value }
-                          })}
-                          className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                        />
-                      </div>
+                    {/* Villa Audio */}
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Villa Ambient Background Audio URL (MP3)</label>
+                      <input
+                        type="text"
+                        value={formData.settings.villaAudioUrl || ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, villaAudioUrl: e.target.value }
+                        })}
+                        className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Restaurant Hero Media */}
-                <div className="bg-[#121822] p-6 rounded-2xl border border-white/5">
-                  <h3 className="text-gold font-bold text-sm mb-2 flex items-center gap-2">
-                    <Utensils className="w-4 h-4" /> Restaurant Hero Video & Audio
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs text-gold-light font-bold mb-1.5">Restaurant Hero Video URL (MP4 / WebM)</label>
+                <div className="bg-[#121822] p-6 rounded-2xl border border-gold/20 shadow-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h3 className="text-gold font-bold text-sm flex items-center gap-2">
+                      <Utensils className="w-4 h-4" /> Restaurant Hero Background (Photo / Video)
+                    </h3>
+                    
+                    {/* Mode Selector */}
+                    <div className="flex items-center bg-[#0A0E14] p-1 rounded-xl border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, restaurantHeroMediaType: 'image' }
+                        })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          (formData.settings.restaurantHeroMediaType || 'video') === 'image'
+                            ? 'bg-gold text-black shadow-md'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Camera className="w-3.5 h-3.5" /> 🖼️ Photo Background
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, restaurantHeroMediaType: 'video' }
+                        })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          (formData.settings.restaurantHeroMediaType || 'video') === 'video'
+                            ? 'bg-gold text-black shadow-md'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Film className="w-3.5 h-3.5" /> 🎬 Video Background
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {/* Restaurant Photo Upload */}
+                    <div className="bg-[#0A0E14] p-4 rounded-xl border border-white/5">
+                      <label className="block text-xs text-gold-light font-bold mb-2 flex items-center gap-1.5">
+                        <Camera className="w-4 h-4 text-gold" /> Restaurant Hero Photo (From Phone / PC)
+                      </label>
+                      
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <img
+                          src={formData.settings.restaurantHeroFallbackImg || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80'}
+                          alt="Restaurant Hero Preview"
+                          className="w-32 h-20 object-cover rounded-xl border border-gold/40 shadow-md"
+                        />
+                        <div className="flex-1 w-full space-y-2">
+                          <input
+                            type="text"
+                            value={formData.settings.restaurantHeroFallbackImg || ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              settings: { ...formData.settings, restaurantHeroFallbackImg: e.target.value }
+                            })}
+                            placeholder="Image URL or upload from your device"
+                            className="w-full bg-[#121822] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                          />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <label className="inline-flex items-center gap-1.5 bg-gold hover:bg-gold-light text-black text-xs font-bold px-4 py-2 rounded-xl cursor-pointer transition-all shadow-md">
+                              <Upload className="w-3.5 h-3.5" /> 📷 Upload Photo from Phone/PC
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
+                                  setFormData({
+                                    ...formData,
+                                    settings: {
+                                      ...formData.settings,
+                                      restaurantHeroFallbackImg: dataUrl,
+                                      restaurantHeroMediaType: 'image'
+                                    }
+                                  });
+                                }, 'Restaurant Hero Photo')}
+                              />
+                            </label>
+                            {(formData.settings.restaurantHeroMediaType || 'video') !== 'image' && (
+                              <button
+                                type="button"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  settings: { ...formData.settings, restaurantHeroMediaType: 'image' }
+                                })}
+                                className="text-[11px] text-gold hover:underline"
+                              >
+                                Set as Active Background
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Restaurant Video Settings */}
+                    <div className="bg-[#0A0E14] p-4 rounded-xl border border-white/5 space-y-3">
+                      <label className="block text-xs text-gold-light font-bold flex items-center gap-1.5">
+                        <Video className="w-4 h-4 text-gold" /> Restaurant Hero Video (MP4 / WebM)
+                      </label>
                       <input
                         type="text"
-                        value={formData.settings.restaurantHeroVideo}
+                        value={formData.settings.restaurantHeroVideo || ''}
                         onChange={(e) => setFormData({
                           ...formData,
                           settings: { ...formData.settings, restaurantHeroVideo: e.target.value }
                         })}
                         placeholder="Paste .mp4 link or upload below"
-                        className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white"
+                        className="w-full bg-[#121822] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
                       />
-                      <div className="flex items-center gap-3 mt-2">
-                        <label className="inline-flex items-center gap-1.5 bg-gold/15 hover:bg-gold text-gold hover:text-black text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
-                          <Video className="w-3.5 h-3.5" /> Upload Video from Phone/PC (.mp4)
-                          <input
-                            type="file"
-                            accept="video/mp4,video/webm"
-                            className="hidden"
-                            onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
-                              setFormData({
-                                ...formData,
-                                settings: { ...formData.settings, restaurantHeroVideo: dataUrl }
-                              });
-                            }, 'Restaurant Video')}
-                          />
-                        </label>
-                      </div>
+                      <label className="inline-flex items-center gap-1.5 bg-gold/15 hover:bg-gold text-gold hover:text-black text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
+                        <Video className="w-3.5 h-3.5" /> Upload Video from Phone/PC (.mp4)
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e.target.files[0], (dataUrl) => {
+                            setFormData({
+                              ...formData,
+                              settings: {
+                                ...formData.settings,
+                                restaurantHeroVideo: dataUrl,
+                                restaurantHeroMediaType: 'video'
+                              }
+                            });
+                          }, 'Restaurant Video')}
+                        />
+                      </label>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs text-gray-400 mb-1">Restaurant Background Audio URL (MP3)</label>
-                        <input
-                          type="text"
-                          value={formData.settings.restaurantAudioUrl}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            settings: { ...formData.settings, restaurantAudioUrl: e.target.value }
-                          })}
-                          className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-400 mb-1">Restaurant Poster Image</label>
-                        <input
-                          type="text"
-                          value={formData.settings.restaurantHeroFallbackImg}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            settings: { ...formData.settings, restaurantHeroFallbackImg: e.target.value }
-                          })}
-                          className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                        />
-                      </div>
+                    {/* Restaurant Audio */}
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Restaurant Ambient Background Audio URL (MP3)</label>
+                      <input
+                        type="text"
+                        value={formData.settings.restaurantAudioUrl || ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          settings: { ...formData.settings, restaurantAudioUrl: e.target.value }
+                        })}
+                        className="w-full bg-[#0A0E14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                      />
                     </div>
                   </div>
                 </div>
